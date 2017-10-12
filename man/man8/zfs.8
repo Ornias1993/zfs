@@ -1193,7 +1193,7 @@ Salted checksum algorithms
 .Pq Cm edonr , skein
 are currently not supported for any filesystem on the boot pools.
 .It Xo
-.Sy compression Ns = Ns Sy on Ns | Ns Sy off Ns | Ns Sy gzip Ns | Ns
+.Sy compression Ns = Ns Sy on Ns | Ns Sy off Ns | Ns Sy adaptive Ns | Ns Sy gzip Ns | Ns
 .Sy gzip- Ns Em N Ns | Ns Sy lz4 Ns | Ns Sy lzjb Ns | Ns Sy zle
 .Xc
 Controls the compression algorithm used for this dataset.
@@ -1214,6 +1214,16 @@ or, if the
 .Sy lz4_compress
 feature is enabled,
 .Sy lz4 .
+.Pp
+If compression is set to
+.Sy adaptive
+the optimal compression algorithm out of lz4 and gzip-[1-9] will be choosen based on system load and write performance of the pool's devices, to maintain optimal write speed. To use this compression mode, the
+.Sy compress_adaptive
+feature flag needs to be enabled. See
+.Xr zpool-features 5
+for details on ZFS feature flags and the
+.Sy compress_adaptive
+feature.
 .Pp
 The
 .Sy lz4

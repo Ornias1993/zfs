@@ -4237,6 +4237,59 @@ dsl_dataset_create_remap_deadlist(dsl_dataset_t *ds, dmu_tx_t *tx)
 	spa_feature_incr(spa, SPA_FEATURE_OBSOLETE_COUNTS, tx);
 }
 
+static int
+dsl_dataset_actv_compress_adaptive_check(void *arg, dmu_tx_t *tx)
+{
+	char *ddname = (char *)arg;
+	dsl_pool_t *dp = dmu_tx_pool(tx);
+	dsl_dataset_t *ds;
+	int error;
+
+	error = dsl_dataset_hold(dp, ddname, FTAG, &ds);
+	if (error != 0)
+		return (error);
+
+	if (!spa_feature_is_enabled(dp->dp_spa,
+	    SPA_FEATURE_COMPRESS_ADAPTIVE)) {
+		dsl_dataset_rele(ds, FTAG);
+		return (SET_ERROR(ENOTSUP));
+	}
+
+	dsl_dataset_rele(ds, FTAG);
+	return (0);
+}
+
+static void
+dsl_dataset_actv_compress_adaptive_sync(void *arg, dmu_tx_t *tx)
+{
+	char *ddname = (char *)arg;
+	dsl_pool_t *dp = dmu_tx_pool(tx);
+	dsl_dataset_t *ds;
+
+	VERIFY0(dsl_dataset_hold(dp, ddname, FTAG, &ds));
+
+	if (!ds->ds_feature_inuse[SPA_FEATURE_COMPRESS_ADAPTIVE]) {
+		dsl_dataset_activate_feature(ds->ds_object,
+		    SPA_FEATURE_COMPRESS_ADAPTIVE, tx);
+		ds->ds_feature_inuse[SPA_FEATURE_COMPRESS_ADAPTIVE] = B_TRUE;
+	}
+	dsl_dataset_rele(ds, FTAG);
+}
+
+
+int
+dsl_dataset_activate_compress_adaptive(const char *ddname)
+{
+	int error;
+
+	error = dsl_sync_task(ddname, dsl_dataset_actv_compress_adaptive_check,
+	    dsl_dataset_actv_compress_adaptive_sync, (void *)ddname, 0,
+	    ZFS_SPACE_CHECK_RESERVED);
+
+	return (error);
+}
+
+
 #if defined(_KERNEL) && defined(HAVE_SPL)
 #if defined(_LP64)
 module_param(zfs_max_recordsize, int, 0644);
