@@ -5,3 +5,4 @@
 "Component: Packaging": ["rpm"]
 "Component: ZED": ["cmd/zed"]
 "Component: Share": ["lib/libshare"]
+"Component: Initramfs": ["contrib/initramfs"]
