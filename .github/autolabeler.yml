@@ -1,4 +1,3 @@
-"Status: Code Review Needed": ["*"]
 "Component: Test Suite": ["tests"]
 "Component: Systemd": ["etc/systemd/"]
 "Component: Dracut": ["contrib/dracut"]
