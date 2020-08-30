@@ -243,20 +243,52 @@ Ensure free is called after allocating memory in function().
 Signed-off-by: Contributor <contributor@email.com>
 ```
 
-#### Commit Types
-OpenZFS commit types to differentiate between different types of commits.
-Every commit should include a type prefix in its header. Possible types:
+#### Versioning
+OpenZFS uses semantic versioning where possible. This means versioning follows the following format:
+`Major.Mionor.Patch`
 
+**Major:**
+A breaking or very big change. Considering OpenZFS has strict backwards compatibility, these are almost never used.
+
+**Minor:**
+A change that introduces new features or significant code changes. Mostly user-facing changes or changes that could significantly change how the user experiences the software
+
+**Patch:**
+A small change that would not be actively noticed by most users. Often a bugfix, an addition to the test suite, removing typo's, update to documentation etc.
+
+##### Versioning and backporting
+Only *patch* commits qualify to be backported. However: Backporting *patch* commits is decided on a case-by-case basis. Something being a patch, does not guarantee approval to be backported.
+
+
+#### Commit Types
+OpenZFS uses commit types to differentiate between different types of commits.
+Each type also refers to a specific versioning guideline. The commit with the highest versioning "level" in a release, dictates what next version should be.
+
+However:
+The final say in versioning lays with the OpenZFS leadership and it's maintainers. When there are a lot of patches, they might decide it warrants a "Minor" version increase instead of a "patch"
+
+
+**Possible types, grouped by version change:**
+
+**Major:**
+- None.
+
+**Minor:**
+- **feat**: A new feature
+- **refactor**: A code change that neither fixes a bug nor adds a feature
+- **perf**: A code change that improves performance 
+_perf is a special case, that might be considered a minor or patch, depending on scale_
+
+**Patch:**
 - **build**: Changes that affect the build system or external dependencies (example scopes: gulp, broccoli, npm)
 - **ci**: Changes to our CI configuration files and scripts (example scopes: Travis, Circle, BrowserStack, SauceLabs)
 - **docs**: Documentation only changes
-- **feat**: A new feature
 - **fix**: A bug fix
-- **perf**: A code change that improves performance
-- **refactor**: A code change that neither fixes a bug nor adds a feature
 - **style**: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)
 - **test**: Adding missing tests or correcting existing tests
 - **coverity**: Fixing a coverity defect. See: [Coverity Defect Fixes](#coverity-defect-fixes)
+- **perf**: A code change that improves performance 
+_perf is a special case, that might be considered a minor or patch, depending on scale_
 
 #### Signed Off By
 A line tagged as `Signed-off-by:` must contain the developer's
