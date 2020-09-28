@@ -41,6 +41,9 @@
 #define	ZSTD_LIB_DICTBUILDER 0
 #define	ZSTD_LIB_DEPRECATED 0
 #define	ZSTD_NOBENCH
+#define	ZSTD_NODICT
+#define	ZSTD_NO_INTRINSICS
+#define	ZSTD_NO_UNUSED_FUNCTIONS
 
 /* Include zstd_deps.h first with all the options we need enabled. */
 #define	ZSTD_DEPS_NEED_MALLOC
