@@ -42,6 +42,11 @@
 #define	ZSTD_LIB_DEPRECATED 0
 #define	ZSTD_NOBENCH
 
+/* Include zstd_deps.h first with all the options we need enabled. */
+#define ZSTD_DEPS_NEED_MALLOC
+#define ZSTD_DEPS_NEED_MATH64
+#include "common/zstd_deps.h"
+
 #include "common/debug.c"
 #include "common/entropy_common.c"
 #include "common/error_private.c"

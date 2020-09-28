@@ -29,24 +29,8 @@ To update ZSTD the following steps need to be taken:
    - `zstd/lib/zstd.h`
    - `zstd/lib/common/zstd_errors.h`
 
-This can be done using a few shell commands from inside the zfs repo:
-
-~~~sh
-cd PATH/TO/ZFS
-
-url="https://github.com/facebook/zstd"
-release="$(curl -s "${url}"/releases/latest | grep -oP '(?<=v)[\d\.]+')"
-zstd="/tmp/zstd-${release}/"
-
-wget -O /tmp/zstd.tar.gz \
-    "${url}/releases/download/v${release}/zstd-${release}.tar.gz"
-tar -C /tmp -xzf /tmp/zstd.tar.gz
-
-cp ${zstd}/lib/zstd.h module/zstd/lib/
-cp ${zstd}/lib/zstd_errors.h module/zstd/lib/
-${zstd}/contrib/single_file_libs/combine.sh \
-    -r ${zstd}/lib -o module/zstd/lib/zstd.c module/zstd/zstd-in.c
-~~~
+This can be done using a few shell commands from inside the zfs repo.
+"update_zstd.sh" is included as a scripted example of how to update the ZSTD library.
 
 Note: if the zstd library for zfs is updated to a newer version,
 the macro list in include/zstd_compat_wrapper.h usually needs to be updated.

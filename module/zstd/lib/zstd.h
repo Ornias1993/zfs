@@ -1,37 +1,12 @@
 /*
- * BSD 3-Clause Clear License
+ * Copyright (c) 2016-2020, Yann Collet, Facebook, Inc.
+ * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice,
- * this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- * this list of conditions and the following disclaimer in the documentation
- * and/or other materials provided with the distribution.
- *
- * 3. Neither the name of the copyright holder nor the names of its
- * contributors may be used to endorse or promote products derived from this
- * software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * This source code is licensed under both the BSD-style license (found in the
+ * LICENSE file in the root directory of this source tree) and the GPLv2 (found
+ * in the COPYING file in the root directory of this source tree).
+ * You may select, at your option, one of the above-listed licenses.
  */
-
-/*
- * Copyright (c) 2016-2020, Yann Collet, Facebook, Inc. All rights reserved.
- */
-
 #if defined (__cplusplus)
 extern "C" {
 #endif
@@ -97,16 +72,21 @@ extern "C" {
 /*------   Version   ------*/
 #define ZSTD_VERSION_MAJOR    1
 #define ZSTD_VERSION_MINOR    4
-#define ZSTD_VERSION_RELEASE  5
-
+#define ZSTD_VERSION_RELEASE  6
 #define ZSTD_VERSION_NUMBER  (ZSTD_VERSION_MAJOR *100*100 + ZSTD_VERSION_MINOR *100 + ZSTD_VERSION_RELEASE)
-ZSTDLIB_API unsigned ZSTD_versionNumber(void);   /**< to check runtime library version */
+
+/*! ZSTD_versionNumber() :
+ *  Return runtime library version, the value is (MAJOR*100*100 + MINOR*100 + RELEASE). */
+ZSTDLIB_API unsigned ZSTD_versionNumber(void);
 
 #define ZSTD_LIB_VERSION ZSTD_VERSION_MAJOR.ZSTD_VERSION_MINOR.ZSTD_VERSION_RELEASE
 #define ZSTD_QUOTE(str) #str
 #define ZSTD_EXPAND_AND_QUOTE(str) ZSTD_QUOTE(str)
 #define ZSTD_VERSION_STRING ZSTD_EXPAND_AND_QUOTE(ZSTD_LIB_VERSION)
-ZSTDLIB_API const char* ZSTD_versionString(void);   /* requires v1.3.0+ */
+
+/*! ZSTD_versionString() :
+ *  Return runtime library version, like "1.4.5". Requires v1.3.0+. */
+ZSTDLIB_API const char* ZSTD_versionString(void);
 
 /* *************************************
  *  Default constant
@@ -390,16 +370,20 @@ typedef enum {
     ZSTD_c_dictIDFlag=202,   /* When applicable, dictionary's ID is written into frame header (default:1) */
 
     /* multi-threading parameters */
-    /* These parameters are only useful if multi-threading is enabled (compiled with build macro ZSTD_MULTITHREAD).
-     * They return an error otherwise. */
+    /* These parameters are only active if multi-threading is enabled (compiled with build macro ZSTD_MULTITHREAD).
+     * Otherwise, trying to set any other value than default (0) will be a no-op and return an error.
+     * In a situation where it's unknown if the linked library supports multi-threading or not,
+     * setting ZSTD_c_nbWorkers to any value >= 1 and consulting the return value provides a quick way to check this property.
+     */
     ZSTD_c_nbWorkers=400,    /* Select how many threads will be spawned to compress in parallel.
-                              * When nbWorkers >= 1, triggers asynchronous mode when used with ZSTD_compressStream*() :
+                              * When nbWorkers >= 1, triggers asynchronous mode when invoking ZSTD_compressStream*() :
                               * ZSTD_compressStream*() consumes input and flush output if possible, but immediately gives back control to caller,
-                              * while compression work is performed in parallel, within worker threads.
+                              * while compression is performed in parallel, within worker thread(s).
                               * (note : a strong exception to this rule is when first invocation of ZSTD_compressStream2() sets ZSTD_e_end :
                               *  in which case, ZSTD_compressStream2() delegates to ZSTD_compress2(), which is always a blocking call).
                               * More workers improve speed, but also increase memory usage.
-                              * Default value is `0`, aka "single-threaded mode" : no worker is spawned, compression is performed inside Caller's thread, all invocations are blocking */
+                              * Default value is `0`, aka "single-threaded mode" : no worker is spawned,
+                              * compression is performed inside Caller's thread, and all invocations are blocking */
     ZSTD_c_jobSize=401,      /* Size of a compression job. This value is enforced only when nbWorkers >= 1.
                               * Each compression job is completed in parallel, so this value can indirectly impact the nb of active threads.
                               * 0 means default, which is dynamically determined based on compression parameters.
@@ -428,6 +412,7 @@ typedef enum {
      * ZSTD_c_literalCompressionMode
      * ZSTD_c_targetCBlockSize
      * ZSTD_c_srcSizeHint
+     * ZSTD_c_enableDedicatedDictSearch
      * Because they are not stable, it's necessary to define ZSTD_STATIC_LINKING_ONLY to access them.
      * note : never ever use experimentalParam? names directly;
      *        also, the enums values themselves are unstable and can still change.
@@ -438,7 +423,8 @@ typedef enum {
      ZSTD_c_experimentalParam4=1001,
      ZSTD_c_experimentalParam5=1002,
      ZSTD_c_experimentalParam6=1003,
-     ZSTD_c_experimentalParam7=1004
+     ZSTD_c_experimentalParam7=1004,
+     ZSTD_c_experimentalParam8=1005
 } ZSTD_cParameter;
 
 typedef struct {
@@ -549,11 +535,13 @@ typedef enum {
      * At the time of this writing, they include :
      * ZSTD_d_format
      * ZSTD_d_stableOutBuffer
+     * ZSTD_d_forceIgnoreChecksum
      * Because they are not stable, it's necessary to define ZSTD_STATIC_LINKING_ONLY to access them.
      * note : never ever use experimentalParam? names directly
      */
      ZSTD_d_experimentalParam1=1000,
-     ZSTD_d_experimentalParam2=1001
+     ZSTD_d_experimentalParam2=1001,
+     ZSTD_d_experimentalParam3=1002
 
 } ZSTD_dParameter;
 
@@ -689,8 +677,9 @@ typedef enum {
  *  - Compression parameters cannot be changed once compression is started (save a list of exceptions in multi-threading mode)
  *  - output->pos must be <= dstCapacity, input->pos must be <= srcSize
  *  - output->pos and input->pos will be updated. They are guaranteed to remain below their respective limit.
+ *  - endOp must be a valid directive
  *  - When nbWorkers==0 (default), function is blocking : it completes its job before returning to caller.
- *  - When nbWorkers>=1, function is non-blocking : it just acquires a copy of input, and distributes jobs to internal worker threads, flush whatever is available,
+ *  - When nbWorkers>=1, function is non-blocking : it copies a portion of input, distributes jobs to internal worker threads, flush to output whatever is available,
  *                                                  and then immediately returns, just indicating that there is some data remaining to be flushed.
  *                                                  The function nonetheless guarantees forward progress : it will return only after it reads or write at least 1+ byte.
  *  - Exception : if the first call requests a ZSTD_e_end directive and provides enough dstCapacity, the function delegates to ZSTD_compress2() which is always blocking.
@@ -1182,6 +1171,12 @@ typedef enum {
 } ZSTD_format_e;
 
 typedef enum {
+    /* Note: this enum controls ZSTD_d_forceIgnoreChecksum */
+    ZSTD_d_validateChecksum = 0,
+    ZSTD_d_ignoreChecksum = 1
+} ZSTD_forceIgnoreChecksum_e;
+
+typedef enum {
     /* Note: this enum and the behavior it controls are effectively internal
      * implementation details of the compressor. They are expected to continue
      * to evolve and should be considered only in the context of extremely
@@ -1397,7 +1392,11 @@ ZSTDLIB_API const ZSTD_DDict* ZSTD_initStaticDDict(
 typedef void* (*ZSTD_allocFunction) (void* opaque, size_t size);
 typedef void  (*ZSTD_freeFunction) (void* opaque, void* address);
 typedef struct { ZSTD_allocFunction customAlloc; ZSTD_freeFunction customFree; void* opaque; } ZSTD_customMem;
-static ZSTD_customMem const ZSTD_defaultCMem = { NULL, NULL, NULL };  /**< this constant defers to stdlib's functions */
+static
+#ifdef __GNUC__
+__attribute__((__unused__))
+#endif
+ZSTD_customMem const ZSTD_defaultCMem = { NULL, NULL, NULL };  /**< this constant defers to stdlib's functions */
 
 ZSTDLIB_API ZSTD_CCtx*    ZSTD_createCCtx_advanced(ZSTD_customMem customMem);
 ZSTDLIB_API ZSTD_CStream* ZSTD_createCStream_advanced(ZSTD_customMem customMem);
@@ -1409,6 +1408,16 @@ ZSTDLIB_API ZSTD_CDict* ZSTD_createCDict_advanced(const void* dict, size_t dictS
                                                   ZSTD_dictContentType_e dictContentType,
                                                   ZSTD_compressionParameters cParams,
                                                   ZSTD_customMem customMem);
+
+/**
+ * This API is temporary and is expected to change or disappear in the future!
+ */
+ZSTDLIB_API ZSTD_CDict* ZSTD_createCDict_advanced2(
+    const void* dict, size_t dictSize,
+    ZSTD_dictLoadMethod_e dictLoadMethod,
+    ZSTD_dictContentType_e dictContentType,
+    const ZSTD_CCtx_params* cctxParams,
+    ZSTD_customMem customMem);
 
 ZSTDLIB_API ZSTD_DDict* ZSTD_createDDict_advanced(const void* dict, size_t dictSize,
                                                   ZSTD_dictLoadMethod_e dictLoadMethod,
@@ -1543,6 +1552,62 @@ ZSTDLIB_API size_t ZSTD_CCtx_refPrefix_advanced(ZSTD_CCtx* cctx, const void* pre
  * but compression ratio may regress significantly if guess considerably underestimates */
 #define ZSTD_c_srcSizeHint ZSTD_c_experimentalParam7
 
+/* Controls whether the new and experimental "dedicated dictionary search
+ * structure" can be used. This feature is still rough around the edges, be
+ * prepared for surprising behavior!
+ *
+ * How to use it:
+ *
+ * When using a CDict, whether to use this feature or not is controlled at
+ * CDict creation, and it must be set in a CCtxParams set passed into that
+ * construction (via ZSTD_createCDict_advanced2()). A compression will then
+ * use the feature or not based on how the CDict was constructed; the value of
+ * this param, set in the CCtx, will have no effect.
+ *
+ * However, when a dictionary buffer is passed into a CCtx, such as via
+ * ZSTD_CCtx_loadDictionary(), this param can be set on the CCtx to control
+ * whether the CDict that is created internally can use the feature or not.
+ *
+ * What it does:
+ *
+ * Normally, the internal data structures of the CDict are analogous to what
+ * would be stored in a CCtx after compressing the contents of a dictionary.
+ * To an approximation, a compression using a dictionary can then use those
+ * data structures to simply continue what is effectively a streaming
+ * compression where the simulated compression of the dictionary left off.
+ * Which is to say, the search structures in the CDict are normally the same
+ * format as in the CCtx.
+ *
+ * It is possible to do better, since the CDict is not like a CCtx: the search
+ * structures are written once during CDict creation, and then are only read
+ * after that, while the search structures in the CCtx are both read and
+ * written as the compression goes along. This means we can choose a search
+ * structure for the dictionary that is read-optimized.
+ *
+ * This feature enables the use of that different structure.
+ *
+ * Note that some of the members of the ZSTD_compressionParameters struct have
+ * different semantics and constraints in the dedicated search structure. It is
+ * highly recommended that you simply set a compression level in the CCtxParams
+ * you pass into the CDict creation call, and avoid messing with the cParams
+ * directly.
+ *
+ * Effects:
+ *
+ * This will only have any effect when the selected ZSTD_strategy
+ * implementation supports this feature. Currently, that's limited to
+ * ZSTD_greedy, ZSTD_lazy, and ZSTD_lazy2.
+ *
+ * Note that this means that the CDict tables can no longer be copied into the
+ * CCtx, so the dict attachment mode ZSTD_dictForceCopy will no longer be
+ * useable. The dictionary can only be attached or reloaded.
+ *
+ * In general, you should expect compression to be faster--sometimes very much
+ * so--and CDict creation to be slightly slower. Eventually, we will probably
+ * make this mode the default.
+ */
+#define ZSTD_c_enableDedicatedDictSearch ZSTD_c_experimentalParam8
+
 /*! ZSTD_CCtx_getParameter() :
  *  Get the requested compression parameter value, selected by enum ZSTD_cParameter,
  *  and store it into int* value.
@@ -1591,8 +1656,10 @@ ZSTDLIB_API size_t ZSTD_CCtxParams_init_advanced(ZSTD_CCtx_params* cctxParams, Z
 /*! ZSTD_CCtxParams_setParameter() :
  *  Similar to ZSTD_CCtx_setParameter.
  *  Set one compression parameter, selected by enum ZSTD_cParameter.
- *  Parameters must be applied to a ZSTD_CCtx using ZSTD_CCtx_setParametersUsingCCtxParams().
- * @result : 0, or an error code (which can be tested with ZSTD_isError()).
+ *  Parameters must be applied to a ZSTD_CCtx using
+ *  ZSTD_CCtx_setParametersUsingCCtxParams().
+ * @result : a code representing success or failure (which can be tested with
+ *           ZSTD_isError()).
  */
 ZSTDLIB_API size_t ZSTD_CCtxParams_setParameter(ZSTD_CCtx_params* params, ZSTD_cParameter param, int value);
 
@@ -1708,6 +1775,17 @@ ZSTDLIB_API size_t ZSTD_DCtx_setMaxWindowSize(ZSTD_DCtx* dctx, size_t maxWindowS
  * this flag tells zstd to use the user provided buffer.
  */
 #define ZSTD_d_stableOutBuffer ZSTD_d_experimentalParam2
+
+/* ZSTD_d_forceIgnoreChecksum
+ * Experimental parameter.
+ * Default is 0 == disabled. Set to 1 to enable
+ *
+ * Tells the decompressor to skip checksum validation during decompression, regardless
+ * of whether checksumming was specified during compression. This offers some
+ * slight performance benefits, and may be useful for debugging.
+ * Param has values of type ZSTD_forceIgnoreChecksum_e
+ */
+#define ZSTD_d_forceIgnoreChecksum ZSTD_d_experimentalParam3
 
 /*! ZSTD_DCtx_setFormat() :
  *  Instruct the decoder context about what kind of data to decode next.
