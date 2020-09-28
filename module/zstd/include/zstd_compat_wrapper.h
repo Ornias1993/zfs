@@ -42,7 +42,7 @@
  * list usually needs to be updated.
  * this can be done with some hand crafting of the output of the following
  * script
- * nm zstd.o | awk '{print "#define "$3 " zfs_" $3}' > macrotable
+ * nm zstd.o | awk '{print "#define	"$3 " zfs_" $3}' > macrotable
  */
 
 #define	BIT_initDStream zfs_BIT_initDStream
@@ -458,3 +458,98 @@
 #define	repStartValue zfs_repStartValue
 #define	FSE_isError zfs_FSE_isError
 #define	HUF_isError zfs_HUF_isError
+#define	BIT_flushBits zfs_BIT_flushBits
+#define	blockCompressor zfs_blockCompressor
+#define	CSWTCH zfs_CSWTCH
+#define	dec32table zfs_dec32table
+#define	dec64table zfs_dec64table
+#define	decompress zfs_decompress
+#define	FSE_buildDTable_internal zfs_FSE_buildDTable_internal
+#define	FSE_buildDTable_wksp zfs_FSE_buildDTable_wksp
+#define	FSE_decompress_wksp_bmi2 zfs_FSE_decompress_wksp_bmi2
+#define	FSE_decompress_wksp_body_bmi2 zfs_FSE_decompress_wksp_body_bmi2
+#define	FSE_decompress_wksp_body_default \
+	zfs_FSE_decompress_wksp_body_default
+#define	FSE_encodeSymbol zfs_FSE_encodeSymbol
+#define	FSE_initCState2 zfs_FSE_initCState2
+#define	FSE_initDState zfs_FSE_initDState
+#define	FSE_readNCount_bmi2 zfs_FSE_readNCount_bmi2
+#define	FSE_readNCount_body_bmi2 zfs_FSE_readNCount_body_bmi2
+#define	FSE_readNCount_body_default zfs_FSE_readNCount_body_default
+#define	FSE_writeNCount_generic zfs_FSE_writeNCount_generic
+#define	g_poolCtx zfs_g_poolCtx
+#define	HIST_isError zfs_HIST_isError
+#define	HUF_compress1X_usingCTable_internal_bmi2 \
+	zfs_HUF_compress1X_usingCTable_internal_bmi2
+#define	HUF_compress1X_usingCTable_internal_default \
+	zfs_HUF_compress1X_usingCTable_internal_default
+#define	HUF_compress4X_usingCTable_internal \
+	zfs_HUF_compress4X_usingCTable_internal
+#define	HUF_compressCTable_internal zfs_HUF_compressCTable_internal
+#define	HUF_compress_internal zfs_HUF_compress_internal
+#define	HUF_decompress1X1_usingDTable_internal_bmi2 \
+	zfs_HUF_decompress1X1_usingDTable_internal_bmi2
+#define	HUF_decompress1X1_usingDTable_internal_default \
+	zfs_HUF_decompress1X1_usingDTable_internal_default
+#define	HUF_decompress1X2_usingDTable_internal_bmi2 \
+	zfs_HUF_decompress1X2_usingDTable_internal_bmi2
+#define	HUF_decompress1X2_usingDTable_internal_default \
+	zfs_HUF_decompress1X2_usingDTable_internal_default
+#define	HUF_decompress4X1_usingDTable_internal_bmi2 \
+	zfs_HUF_decompress4X1_usingDTable_internal_bmi2
+#define	HUF_decompress4X1_usingDTable_internal_default \
+	zfs_HUF_decompress4X1_usingDTable_internal_default
+#define	HUF_decompress4X2_usingDTable_internal_bmi2 \
+	zfs_HUF_decompress4X2_usingDTable_internal_bmi2
+#define	HUF_decompress4X2_usingDTable_internal_default \
+	zfs_HUF_decompress4X2_usingDTable_internal_default
+#define	HUF_readDTableX1_wksp_bmi2 zfs_HUF_readDTableX1_wksp_bmi2
+#define	HUF_readStats_body_bmi2 zfs_HUF_readStats_body_bmi2
+#define	HUF_readStats_wksp zfs_HUF_readStats_wksp
+#define	LL_Code zfs_LL_Code
+#define	ML_Code zfs_ML_Code
+#define	rtbTable zfs_rtbTable
+#define	ZSTD_BtFindBestMatch_dictMatchState_selectMLS \
+	zfs_ZSTD_BtFindBestMatch_dictMatchState_selectMLS
+#define	ZSTD_buildFSETable_body_bmi2 zfs_ZSTD_buildFSETable_body_bmi2
+#define	ZSTD_buildFSETable_body_default zfs_ZSTD_buildFSETable_body_default
+#define	ZSTD_clearAllDicts zfs_ZSTD_clearAllDicts
+#define	ZSTD_compressBegin_internal zfs_ZSTD_compressBegin_internal
+#define	ZSTD_compressBlock_greedy_dedicatedDictSearch \
+	zfs_ZSTD_compressBlock_greedy_dedicatedDictSearch
+#define	ZSTD_compressBlock_lazy2_dedicatedDictSearch \
+	zfs_ZSTD_compressBlock_lazy2_dedicatedDictSearch
+#define	ZSTD_compressBlock_lazy_dedicatedDictSearch \
+	zfs_ZSTD_compressBlock_lazy_dedicatedDictSearch
+#define	ZSTD_compress_insertDictionary zfs_ZSTD_compress_insertDictionary
+#define	ZSTD_copyCCtx_internal zfs_ZSTD_copyCCtx_internal
+#define	ZSTD_createCDict_advanced2 zfs_ZSTD_createCDict_advanced2
+#define	ZSTD_customCalloc zfs_ZSTD_customCalloc
+#define	ZSTD_customFree zfs_ZSTD_customFree
+#define	ZSTD_customMalloc zfs_ZSTD_customMalloc
+#define	ZSTD_cwksp_reserve_internal zfs_ZSTD_cwksp_reserve_internal
+#define	ZSTD_decodeFrameHeader zfs_ZSTD_decodeFrameHeader
+#define	ZSTD_decompressSequences_bmi2 zfs_ZSTD_decompressSequences_bmi2
+#define	ZSTD_decompressSequences_default zfs_ZSTD_decompressSequences_default
+#define	ZSTD_decompressSequencesLong_bmi2 \
+	zfs_ZSTD_decompressSequencesLong_bmi2
+#define	ZSTD_decompressSequencesLong_default \
+	zfs_ZSTD_decompressSequencesLong_default
+#define	ZSTD_dedicatedDictSearch_lazy_loadDictionary\
+	zfs_ZSTD_dedicatedDictSearch_lazy_loadDictionary
+#define	ZSTD_defaultCMem zfs_ZSTD_defaultCMem
+#define	ZSTD_encodeSequences_bmi2 zfs_ZSTD_encodeSequences_bmi2
+#define	ZSTD_estimateSubBlockSize_symbolType \
+	zfs_ZSTD_estimateSubBlockSize_symbolType
+#define	ZSTD_execSequenceEnd zfs_ZSTD_execSequenceEnd
+#define	ZSTD_HcFindBestMatch_dedicatedDictSearch_selectMLS \
+	zfs_ZSTD_HcFindBestMatch_dedicatedDictSearch_selectMLS
+#define	ZSTD_HcFindBestMatch_dictMatchState_selectMLS \
+	zfs_ZSTD_HcFindBestMatch_dictMatchState_selectMLS
+#define	ZSTD_insertBt1 zfs_ZSTD_insertBt1
+#define	ZSTD_litLengthPrice zfs_ZSTD_litLengthPrice
+#define	ZSTD_overflowCorrectIfNeeded zfs_ZSTD_overflowCorrectIfNeeded
+#define	ZSTD_safecopyLiterals zfs_ZSTD_safecopyLiterals
+#define	ZSTD_setBasePrices zfs_ZSTD_setBasePrices
+#define	ZSTD_updateDUBT zfs_ZSTD_updateDUBT
+#define	ZSTD_XXH64_update zfs_ZSTD_XXH64_update

@@ -34,9 +34,13 @@ This can be done using a few shell commands from inside the zfs repo.
 
 Note: if the zstd library for zfs is updated to a newer version,
 the macro list in include/zstd_compat_wrapper.h usually needs to be updated.
-this can be done with some hand crafting of the output of the following
-script: nm zstd.o | awk '{print "#define "$3 " zfs_" $3}' > macrotable
+One can use the following script to create a list of required macros: 
+```
+nm zstd.o | awk '{print "#define "$3 " zfs_" $3}' > macrotable
+```
 
+This list then needs to be manually filtered for relevance, validity, duplicates, blank lines etc.
+_TODO: Add a script to automate some repeatitive bits of this a little more_
 
 ## Altering ZSTD and breaking changes
 
