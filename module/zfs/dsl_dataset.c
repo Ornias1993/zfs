@@ -5016,7 +5016,7 @@ dsl_dataset_actv_compress_adaptive_sync(void *arg, dmu_tx_t *tx)
 
 
 int
-dsl_dataset_activate_compress_adaptive(const char *ddname)
+dsl_dataset_activate_compress_adaptive(char *ddname)
 {
 	int error;
 
