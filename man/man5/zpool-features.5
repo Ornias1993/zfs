@@ -282,8 +282,38 @@ healing resilver when the time to verify the checksums is included.  However,
 unless there is additional pool damage no checksum errors should be reported
 by the scrub.  This feature is incompatible with raidz configurations.
 
+
 This feature becomes \fBactive\fR while a sequential resilver is in progress,
 and returns to \fBenabled\fR when the resilver completes.
+
+.RE
+
+.sp
+.ne 2
+.na
+\fB\fBcompress_adaptive\fR\fR
+.ad
+.RS 4n
+.TS
+l l .
+GUID	org.zfsonlinux:compress_adaptive
+READ\-ONLY COMPATIBLE	yes
+DEPENDENCIES	lz4_compress,extensible_dataset
+.TE
+
+\fBcompress_adaptive\fR chooses the compression algorithm out of lz4 and gzip[1-9] 
+to perform with optimal write throughput.
+
+When the \fBcompress_adaptive\fR feature is set to \fBenabled\fR, the
+administrator can turn on \fBcompress_adaptive\fR on any dataset on the
+pool using the \fBzfs\fR(8) command. Please note that doing so will
+immediately activate the \fBcompress_adaptive\fR feature on the underlying
+pool.
+
+This feature becomes \fBactive\fR as soon as it is used on one dataset and will 
+return to being \fBenabled\fR once all filesystems that have ever had their compression set to
++\fBcompress_adaptive\fR are destroyed.
+
 .RE
 
 .sp
@@ -298,7 +328,6 @@ GUID	com.delphix:device_removal
 READ\-ONLY COMPATIBLE	no
 DEPENDENCIES	none
 .TE
-
 This feature enables the \fBzpool remove\fR subcommand to remove top-level
 vdevs, evacuating them to reduce the total size of the pool.
 

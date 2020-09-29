@@ -2450,9 +2450,20 @@ zfs_prop_set_special(const char *dsname, zprop_source_t source,
 		if (err == 0)
 			err = -1;
 		break;
+	case ZFS_PROP_COMPRESSION:
+		if (intval == ZIO_COMPRESS_ADAPTIVE) {
+			err = dsl_dataset_activate_compress_adaptive(dsname);
+		}
+		err = dsl_dataset_set_compression(dsname, source, intval);
+		/*
+		 * Set err to -1 to force the zfs_set_prop_nvlist code down the
+		 * default path to set the value in the nvlist.
+		 */
+		if (err == 0)
+			err = -1;
+		break;
 	case ZFS_PROP_KEYLOCATION:
 		err = dsl_crypto_can_set_keylocation(dsname, strval);
-
 		/*
 		 * Set err to -1 to force the zfs_set_prop_nvlist code down the
 		 * default path to set the value in the nvlist.
@@ -2465,15 +2476,6 @@ zfs_prop_set_special(const char *dsname, zprop_source_t source,
 		break;
 	case ZFS_PROP_REFRESERVATION:
 		err = dsl_dataset_set_refreservation(dsname, source, intval);
-		break;
-	case ZFS_PROP_COMPRESSION:
-		err = dsl_dataset_set_compression(dsname, source, intval);
-		/*
-		 * Set err to -1 to force the zfs_set_prop_nvlist code down the
-		 * default path to set the value in the nvlist.
-		 */
-		if (err == 0)
-			err = -1;
 		break;
 	case ZFS_PROP_VOLSIZE:
 		err = zvol_set_volsize(dsname, intval);
@@ -4482,6 +4484,20 @@ zfs_check_settable(const char *dsname, nvpair_t *pair, cred_t *cr)
 
 				if (!spa_feature_is_enabled(spa,
 				    SPA_FEATURE_ZSTD_COMPRESS)) {
+					spa_close(spa, FTAG);
+					return (SET_ERROR(ENOTSUP));
+				}
+				spa_close(spa, FTAG);
+			}
+
+			if (intval == ZIO_COMPRESS_ADAPTIVE) {
+				spa_t *spa;
+
+				if ((err = spa_open(dsname, &spa, FTAG)) != 0)
+					return (err);
+
+				if (!spa_feature_is_enabled(spa,
+				    SPA_FEATURE_COMPRESS_ADAPTIVE)) {
 					spa_close(spa, FTAG);
 					return (SET_ERROR(ENOTSUP));
 				}
