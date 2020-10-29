@@ -202,7 +202,6 @@ static struct zstd_fallback_mem zstd_dctx_fallback;
 static struct zstd_pool *zstd_mempool_cctx;
 static struct zstd_pool *zstd_mempool_dctx;
 
-
 static void
 zstd_mempool_reap(struct zstd_pool *zstd_mempool)
 {
