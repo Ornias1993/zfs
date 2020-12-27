@@ -8163,8 +8163,7 @@ const char* ZSTD_versionString(void) { return ZSTD_VERSION_STRING; }
 *  ZSTD Error Management
 ******************************************/
 #undef ZSTD_isError   /* defined within zstd_internal.h */
-#define ZSTD_isError
-#define ZSTD_isError zfs_ZSTD_isError
+
 /*! ZSTD_isError() :
  *  tells if a return value is an error code
  *  symbol is required for external callers */

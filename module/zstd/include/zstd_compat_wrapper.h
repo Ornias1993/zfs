@@ -446,7 +446,6 @@
 #define	repStartValue zfs_repStartValue
 #define	FSE_isError zfs_FSE_isError
 #define	HUF_isError zfs_HUF_isError
-#define	ZSTD_isError zfs_ZSTD_isError
 #define	ERR_isError zfs_ERR_isError
 #define	FSE_decompress_wksp_bmi2 zfs_FSE_decompress_wksp_bmi2
 #define	FSE_decompress_wksp_body_default zfs_FSE_decompress_wksp_body_default
